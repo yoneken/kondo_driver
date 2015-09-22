@@ -81,7 +81,7 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   CATKIN_DEPENDS roscpp rospy message_runtime
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS include
 #  LIBRARIES kondo_driver
  #  DEPENDS system_lib
 )
