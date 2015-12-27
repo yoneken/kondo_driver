@@ -113,7 +113,8 @@ public:
 	    pos = cmd;
 	    eff = 0;
 	}else{
-	    int pulse_ret = ics_pos(ics, id, pulse_cmd);
+	    int pulse_ret = 0;
+	pulse_ret= ics_pos(ics, id, pulse_cmd);
 	    if (pulse_ret > 0) {
 		pos = pulse_to_radian (pulse_ret);
 	    }
@@ -185,7 +186,8 @@ class KondoDriver : public hardware_interface::RobotHW
 	int product_id;
 	nh.param<int>("product_id", product_id, 0x0006);
 	ROS_INFO("product_id: %d", product_id);
-
+	
+	loopback = false;
 	if (nh.getParam("loopback", loopback)) {
 	    if (loopback) {
 		ROS_WARN("loopback mode: the hardware is not used.");
@@ -209,6 +211,7 @@ class KondoDriver : public hardware_interface::RobotHW
     // Read & write function
     void update () {
 	for (int i=0; i<actuator_vector.size(); i++) {
+	  //ROS_INFO("%s: %d", __func__, i);
 	    actuator_vector[i]->update();
 	}
     }
