@@ -105,6 +105,8 @@ include_directories(
 ## Declare a cpp executable
 add_executable(kondo_driver src/kondo_driver.cpp src/ics.c)
 add_executable(set_ics_id src/set_ics_id.c src/ics.c)
+add_executable(get_ics_eeprom src/get_ics_eeprom.c src/ics.c)
+add_executable(set_ics_wheel src/set_ics_wheel.c src/ics.c)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -116,6 +118,12 @@ target_link_libraries(kondo_driver
   usb ftdi
 )
 target_link_libraries(set_ics_id
+  usb ftdi
+)
+target_link_libraries(get_ics_eeprom
+  usb ftdi
+)
+target_link_libraries(set_ics_wheel
   usb ftdi
 )
 
@@ -134,11 +142,11 @@ target_link_libraries(set_ics_id
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS kondo_driver kondo_driver_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+install(TARGETS kondo_driver set_ics_id get_ics_eeprom set_ics_wheel
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
@@ -148,11 +156,12 @@ target_link_libraries(set_ics_id
 # )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+install(DIRECTORY
+  launch
+  config
+  urdf
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
 #############
 ## Testing ##

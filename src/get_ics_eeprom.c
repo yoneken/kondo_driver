@@ -15,19 +15,10 @@ int main(int argc, char **argv)
 	exit(0);
     }
     ics.debug = 1;
-    // Get servo Id
-    ret = ics_get_id (&ics);
-    fprintf (stderr, "Current servo ID: %x\n", ret);
+    // Get servo EEPROM
+    ret = ics_get_eeprom (&ics, servo_id);
+    fprintf (stderr, "Current servo EEPROM: %x\n", ret);
 
-    // Set servo Id
-    ret = ics_set_id (&ics, servo_id);
-    if (servo_id != ret) {
-	fprintf (stderr, "Could not set ID. %x\n", ret);
-	exit(0);
-    }
-    sleep (3);
-    fprintf (stderr, "Set servo ID correctly: %d\n", servo_id);
-    ret = ics_get_id (&ics);
 
     return 0;
 }	

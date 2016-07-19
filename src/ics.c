@@ -52,7 +52,8 @@ int ics_init(ICSData * r, int product_id)
 	    ics_ftdi_error(r);
 	}
 	// open usb device
-	if (ftdi_usb_open(&r->ftdic, ICS_USB_VID, product_id) < 0) {
+	//if (ftdi_usb_open(&r->ftdic, ICS_USB_VID, product_id) < 0) {
+	if (ftdi_usb_open(&r->ftdic, ICS_USB_VID, ICS_USB_PID) < 0) {
 	    fprintf (stderr, "open");
 	    ics_ftdi_error(r);
 	}
@@ -191,7 +192,7 @@ int ics_trx_timeout(ICSData * r, UINT bytes_out, UINT bytes_in, long timeout)
 	if (r->debug) {
 		printf("send %d bytes: ", i);
 		for (j = 0; j < i; j++)
-			printf("%x ", r->swap[j]);
+			printf("%02x ", r->swap[j]);
 		printf("\n");
 	}
 
@@ -206,7 +207,7 @@ int ics_trx_timeout(ICSData * r, UINT bytes_out, UINT bytes_in, long timeout)
 	if (r->debug) {
 		printf("recv %d bytes: ", i);
 		for (j = 0; j < i; j++)
-			printf("%x ", r->swap[j]);
+			printf("%02x ", r->swap[j]);
 		printf("\n");
 	}
 
@@ -268,6 +269,162 @@ int ics_free(ICSData * r, UINT id)
 }
 
 /*-----------------------------------------------------------------------------
+ * Get servo eeprom
+ * id: the servo id, 0-31
+ * Returns: Value of eeprom
+ */
+int ics_get_eeprom(ICSData * r, UINT id)
+{
+	assert(r);
+	int i;
+
+	// check valid id
+	if (id > 31)
+		ics_error(r, "Invalid servo ID > 31.");
+
+	// build command
+	r->swap[0] = id | ICS_CMD_GET; // id and command
+	r->swap[1] = ICS_SC_EEPROM; // subcommand
+
+	// synchronize
+	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
+		return i;
+
+	// return stretch
+	return r->swap[3];
+}
+
+/*-----------------------------------------------------------------------------
+ * Get servo slave mode
+ * id: the servo id, 0-31
+ * Returns: Value of slave mode
+ */
+int ics_get_slave(ICSData * r, UINT id)
+{
+	assert(r);
+	int i, j;
+
+	// check valid id
+	if (id > 31)
+		ics_error(r, "Invalid servo ID > 31.");
+
+	// build command
+	r->swap[0] = id | ICS_CMD_GET; // id and command
+	r->swap[1] = ICS_SC_EEPROM; // subcommand
+
+	// synchronize
+	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
+		return i;
+
+	// return stretch
+	return (r->swap[66] | ICS_FLAG_SLAVE)==ICS_FLAG_SLAVE;
+}
+
+/*-----------------------------------------------------------------------------
+ * Get servo wheel mode
+ * id: the servo id, 0-31
+ * Returns: Value of wheel mode
+ */
+int ics_get_wheel(ICSData * r, UINT id)
+{
+	assert(r);
+	int i, j;
+
+	// check valid id
+	if (id > 31)
+		ics_error(r, "Invalid servo ID > 31.");
+
+	// build command
+	r->swap[0] = id | ICS_CMD_GET; // id and command
+	r->swap[1] = ICS_SC_EEPROM; // subcommand
+
+	// synchronize
+	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
+		return i;
+
+	// return stretch
+	return (r->swap[66] | ICS_FLAG_WHEEL)==ICS_FLAG_WHEEL;
+}
+
+/*-----------------------------------------------------------------------------
+ * Get servo pwm mode
+ * id: the servo id, 0-31
+ * Returns: Value of pwm mode
+ */
+int ics_get_pwminh(ICSData * r, UINT id)
+{
+	assert(r);
+	int i, j;
+
+	// check valid id
+	if (id > 31)
+		ics_error(r, "Invalid servo ID > 31.");
+
+	// build command
+	r->swap[0] = id | ICS_CMD_GET; // id and command
+	r->swap[1] = ICS_SC_EEPROM; // subcommand
+
+	// synchronize
+	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
+		return i;
+
+	// return stretch
+	return (r->swap[66] | ICS_FLAG_PWMINH)==ICS_FLAG_PWMINH;
+}
+
+/*-----------------------------------------------------------------------------
+ * Get servo free mode
+ * id: the servo id, 0-31
+ * Returns: Value of free mode
+ */
+int ics_get_free(ICSData * r, UINT id)
+{
+	assert(r);
+	int i, j;
+
+	// check valid id
+	if (id > 31)
+		ics_error(r, "Invalid servo ID > 31.");
+
+	// build command
+	r->swap[0] = id | ICS_CMD_GET; // id and command
+	r->swap[1] = ICS_SC_EEPROM; // subcommand
+
+	// synchronize
+	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
+		return i;
+
+	// return stretch
+	return (r->swap[66] | ICS_FLAG_FREE)==ICS_FLAG_FREE;
+}
+
+/*-----------------------------------------------------------------------------
+ * Get servo reverse mode
+ * id: the servo id, 0-31
+ * Returns: Value of reverse mode
+ */
+int ics_get_reverse(ICSData * r, UINT id)
+{
+	assert(r);
+	int i, j;
+
+	// check valid id
+	if (id > 31)
+		ics_error(r, "Invalid servo ID > 31.");
+
+	// build command
+	r->swap[0] = id | ICS_CMD_GET; // id and command
+	r->swap[1] = ICS_SC_EEPROM; // subcommand
+
+	// synchronize
+	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
+		return i;
+
+	// return stretch
+	return (r->swap[66] | ICS_FLAG_REVERSE)==ICS_FLAG_REVERSE;
+}
+
+/*-----------------------------------------------------------------------------
  * Get servo stretch
  * id: the servo id, 0-31
  * Returns: Value of stretch (>= 0) if successful, < 0 if error
@@ -290,7 +447,7 @@ int ics_get_stretch(ICSData * r, UINT id)
 		return i;
 
 	// return stretch
-	return r->swap[4];
+	return r->swap[19];
 }
 
 /*-----------------------------------------------------------------------------
@@ -512,7 +669,7 @@ int ics_set_id(ICSData * r, UINT id)
 	    printf("\n");
 	}
 	// This seems bug. set_id must wait some time before read.
-#if 0	
+#if 1	
 	// synchronize
 	if ((i = ics_trx_timeout(r, 4, 5, ICS_ID_TIMEOUT)) < 0)
 		return i;
@@ -528,3 +685,42 @@ int ics_set_id(ICSData * r, UINT id)
 	// return the ID
 	return r->swap[4] & 0x1F;
 }
+
+/*-----------------------------------------------------------------------------
+ * Set servo wheel mode
+ * id: the servo id, 0-31
+ * Returns: Value of wheel mode
+ */
+int ics_set_wheel(ICSData * r, UINT id)
+{
+	assert(r);
+	int i, j;
+
+	// check valid id
+	if (id > 31)
+		ics_error(r, "Invalid servo ID > 31.");
+
+	// build command
+	r->swap[0] = id | ICS_CMD_GET; // id and command
+	r->swap[1] = ICS_SC_EEPROM; // subcommand
+
+	// synchronize
+	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
+		return i;
+
+	for(j=0;j<64;j++){
+		r->swap[2+j] = r->swap[4+j];
+	}
+
+	r->swap[0] = id | ICS_CMD_SET; // id and command
+	r->swap[1] = ICS_SC_EEPROM; // subcommand
+	r->swap[16] = r->swap[16] | ICS_FLAG_WHEEL; // Upper FLAG
+
+	// synchronize
+	if ((i = ics_trx_timeout(r, 66, 68, ICS_GET_TIMEOUT)) < 0)
+		return i;
+
+	// return stretch
+	return (r->swap[66] & ICS_FLAG_WHEEL)==ICS_FLAG_WHEEL;
+}
+

@@ -29,14 +29,16 @@
 // some options
 #define ICS_BAUD 115200
 //#define ICS_BAUD 1250000
-#define ICS_USB_VID 0x165c
-#define ICS_USB_PID 0x0008  // setting for DUAL USB adapter HS
+#define ICS_USB_VID 0x0403
+#define ICS_USB_PID 0x6001
+//#define ICS_USB_VID 0x165c
+//#define ICS_USB_PID 0x0008  // setting for DUAL USB adapter HS
 //#define ICS_USB_PID 0x0006  // setting for ICS USB adapter HS
 #define ICS_RX_TIMEOUT 1000000
 #define ICS_POS_TIMEOUT 2000
 #define ICS_GET_TIMEOUT 2000
 #define ICS_SET_TIMEOUT 2000
-#define ICS_ID_TIMEOUT 2000
+#define ICS_ID_TIMEOUT 4000
 
 // ics commands
 #define ICS_CMD_POS 0x80
@@ -50,6 +52,11 @@
 #define ICS_SC_TEMPERATURE 4
 #define ICS_SC_READ 0
 #define ICS_SC_WRITE 1
+#define ICS_FLAG_SLAVE 0x08
+#define ICS_FLAG_WHEEL 0x01
+#define ICS_FLAG_PWMINH 0x08
+#define ICS_FLAG_FREE 0x02
+#define ICS_FLAG_REVERSE 0x01
 
 #ifndef __UCHAR__
 #define __UCHAR__
@@ -86,13 +93,17 @@ int ics_hold(ICSData * r, UINT id);
 int ics_free(ICSData * r, UINT id);
 
 // servo setting commands
+int ics_get_eeprom(ICSData * r, UINT id);
 int ics_get_stretch(ICSData * r, UINT id);
 int ics_get_speed(ICSData * r, UINT id);
 int ics_get_current(ICSData * r, UINT id);
+int ics_get_slave(ICSData * r, UINT id);
+int ics_get_wheel(ICSData * r, UINT id);
 int ics_set_stretch(ICSData * r, UINT id, UCHAR stretch);
 int ics_set_speed(ICSData * r, UINT id, UCHAR speed);
 int ics_set_current_limit(ICSData * r, UINT id, UCHAR curlim);
 int ics_set_temperature_limit(ICSData * r, UINT id, UCHAR templim);
+int ics_set_wheel(ICSData * r, UINT id);
 
 // set servo id (for use when 1 servo is connected)
 int ics_get_id(ICSData * r);

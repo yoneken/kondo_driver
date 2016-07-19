@@ -15,19 +15,13 @@ int main(int argc, char **argv)
 	exit(0);
     }
     ics.debug = 1;
-    // Get servo Id
-    ret = ics_get_id (&ics);
-    fprintf (stderr, "Current servo ID: %x\n", ret);
-
-    // Set servo Id
-    ret = ics_set_id (&ics, servo_id);
-    if (servo_id != ret) {
-	fprintf (stderr, "Could not set ID. %x\n", ret);
-	exit(0);
+    // Get servo EEPROM
+    ret = ics_get_reveerse (&ics, servo_id);
+    if(ret == 1){
+        fprintf (stderr, "Reverse mode ON\n");
+    }else{
+        fprintf (stderr, "Reverse mode OFF\n");
     }
-    sleep (3);
-    fprintf (stderr, "Set servo ID correctly: %d\n", servo_id);
-    ret = ics_get_id (&ics);
 
     return 0;
 }	
