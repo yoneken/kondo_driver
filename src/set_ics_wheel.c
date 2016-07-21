@@ -17,7 +17,8 @@ int main(int argc, char **argv)
     ics.debug = 1;
     // Get servo EEPROM
     ret = ics_set_wheel (&ics, servo_id);
-    if(ret == 1){
+    //ret = ics_write_eeprom (&ics, servo_id);
+    if(ret){
         fprintf (stderr, "Wheel mode ON\n");
     }else{
         fprintf (stderr, "Wheel mode OFF\n");

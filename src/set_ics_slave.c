@@ -16,11 +16,11 @@ int main(int argc, char **argv)
     }
     ics.debug = 1;
     // Get servo EEPROM
-    ret = ics_get_wheel (&ics, servo_id);
-    if(ret == 1){
-        fprintf (stderr, "Wheel mode ON\n");
+    ret = ics_set_slave (&ics, servo_id);
+    if(ret){
+        fprintf (stderr, "Slave mode ON\n");
     }else{
-        fprintf (stderr, "Wheel mode OFF\n");
+        fprintf (stderr, "Slave mode OFF\n");
     }
 
     return 0;

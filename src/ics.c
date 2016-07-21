@@ -295,133 +295,34 @@ int ics_get_eeprom(ICSData * r, UINT id)
 }
 
 /*-----------------------------------------------------------------------------
- * Get servo slave mode
+ * Write servo eeprom
  * id: the servo id, 0-31
- * Returns: Value of slave mode
+ * Returns: Value of eeprom
  */
-int ics_get_slave(ICSData * r, UINT id)
+int ics_write_eeprom(ICSData * r, UINT id)
 {
 	assert(r);
 	int i, j;
+	UCHAR dummy[] = {0x05, 0x0a, 0x03, 0x0c, 0x07, 0x0f, 0x00, 0x00, 0x00, 0x04, 0x02, 0x08, 0x01, 0x04, 0x00, 0x04, 0x02, 0x0c, 0x0e, 0x0c, 0x00, 0x0d, 0x0a, 0x0e, 0x00, 0x00, 0x00, 0x0a, 0x05, 0x00, 0x02, 0x08, 0x00, 0x03, 0x09, 0x09, 0x05, 0x0c, 0x09, 0x07, 0x05, 0x0f, 0x09, 0x0a, 0x01, 0x04, 0x09, 0x05, 0x01, 0x0b, 0x00, 0x43, 0x00, 0x00, 0x08, 0x07, 0x00, 0x04, 0x07, 0x08, 0x03, 0x0c, 0x0b, 0x04};
 
 	// check valid id
 	if (id > 31)
 		ics_error(r, "Invalid servo ID > 31.");
 
 	// build command
-	r->swap[0] = id | ICS_CMD_GET; // id and command
+	r->swap[0] = id | ICS_CMD_SET; // id and command
 	r->swap[1] = ICS_SC_EEPROM; // subcommand
 
+	for(j=0;j<64;j++){
+		r->swap[2+j] = dummy[j];
+	}
+
 	// synchronize
-	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
+	if ((i = ics_trx_timeout(r, 66, 68, ICS_GET_TIMEOUT)) < 0)
 		return i;
 
 	// return stretch
-	return (r->swap[66] | ICS_FLAG_SLAVE)==ICS_FLAG_SLAVE;
-}
-
-/*-----------------------------------------------------------------------------
- * Get servo wheel mode
- * id: the servo id, 0-31
- * Returns: Value of wheel mode
- */
-int ics_get_wheel(ICSData * r, UINT id)
-{
-	assert(r);
-	int i, j;
-
-	// check valid id
-	if (id > 31)
-		ics_error(r, "Invalid servo ID > 31.");
-
-	// build command
-	r->swap[0] = id | ICS_CMD_GET; // id and command
-	r->swap[1] = ICS_SC_EEPROM; // subcommand
-
-	// synchronize
-	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
-		return i;
-
-	// return stretch
-	return (r->swap[66] | ICS_FLAG_WHEEL)==ICS_FLAG_WHEEL;
-}
-
-/*-----------------------------------------------------------------------------
- * Get servo pwm mode
- * id: the servo id, 0-31
- * Returns: Value of pwm mode
- */
-int ics_get_pwminh(ICSData * r, UINT id)
-{
-	assert(r);
-	int i, j;
-
-	// check valid id
-	if (id > 31)
-		ics_error(r, "Invalid servo ID > 31.");
-
-	// build command
-	r->swap[0] = id | ICS_CMD_GET; // id and command
-	r->swap[1] = ICS_SC_EEPROM; // subcommand
-
-	// synchronize
-	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
-		return i;
-
-	// return stretch
-	return (r->swap[66] | ICS_FLAG_PWMINH)==ICS_FLAG_PWMINH;
-}
-
-/*-----------------------------------------------------------------------------
- * Get servo free mode
- * id: the servo id, 0-31
- * Returns: Value of free mode
- */
-int ics_get_free(ICSData * r, UINT id)
-{
-	assert(r);
-	int i, j;
-
-	// check valid id
-	if (id > 31)
-		ics_error(r, "Invalid servo ID > 31.");
-
-	// build command
-	r->swap[0] = id | ICS_CMD_GET; // id and command
-	r->swap[1] = ICS_SC_EEPROM; // subcommand
-
-	// synchronize
-	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
-		return i;
-
-	// return stretch
-	return (r->swap[66] | ICS_FLAG_FREE)==ICS_FLAG_FREE;
-}
-
-/*-----------------------------------------------------------------------------
- * Get servo reverse mode
- * id: the servo id, 0-31
- * Returns: Value of reverse mode
- */
-int ics_get_reverse(ICSData * r, UINT id)
-{
-	assert(r);
-	int i, j;
-
-	// check valid id
-	if (id > 31)
-		ics_error(r, "Invalid servo ID > 31.");
-
-	// build command
-	r->swap[0] = id | ICS_CMD_GET; // id and command
-	r->swap[1] = ICS_SC_EEPROM; // subcommand
-
-	// synchronize
-	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
-		return i;
-
-	// return stretch
-	return (r->swap[66] | ICS_FLAG_REVERSE)==ICS_FLAG_REVERSE;
+	return r->swap[3];
 }
 
 /*-----------------------------------------------------------------------------
@@ -687,9 +588,114 @@ int ics_set_id(ICSData * r, UINT id)
 }
 
 /*-----------------------------------------------------------------------------
- * Set servo wheel mode
+ * Clear servo flags
  * id: the servo id, 0-31
- * Returns: Value of wheel mode
+ * Returns: Result to clear flags
+ */
+int ics_clear_flag(ICSData * r, UINT id)
+{
+	assert(r);
+	int i, j;
+
+	// check valid id
+	if (id > 31)
+		ics_error(r, "Invalid servo ID > 31.");
+
+	// build command
+	r->swap[0] = id | ICS_CMD_GET; // id and command
+	r->swap[1] = ICS_SC_EEPROM; // subcommand
+
+	// synchronize
+	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
+		return i;
+
+	if ( i != 68){
+		ics_error(r, "Error: could not get enough eeprom data size.");
+		return 0;
+	}
+
+	for(j=0;j<64;j++){
+		r->swap[2+j] = r->swap[4+j];
+	}
+
+	r->swap[0] = id | ICS_CMD_SET; // id and command
+	r->swap[1] = ICS_SC_EEPROM; // subcommand
+	r->swap[16] = (r->swap[16] & ~ICS_FLAG_SLAVE); // Upper FLAG
+	r->swap[16] = (r->swap[16] & ~ICS_FLAG_WHEEL); // Upper FLAG
+	r->swap[17] = (r->swap[17] & ~ICS_FLAG_PWMINH); // Lower FLAG
+	r->swap[17] = (r->swap[17] & ~ICS_FLAG_REVERSE); // Lower FLAG
+
+	// synchronize
+	if ((i = ics_trx_timeout(r, 66, 68, ICS_GET_TIMEOUT)) < 0)
+		return i;
+
+	// build command
+	r->swap[0] = id | ICS_CMD_GET; // id and command
+	r->swap[1] = ICS_SC_EEPROM; // subcommand
+
+	// synchronize
+	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
+		return i;
+
+	// return result
+	return !((r->swap[18] & ICS_FLAG_SLAVE)&&(r->swap[18] & ICS_FLAG_WHEEL)&&(r->swap[19] & ICS_FLAG_PWMINH)&&(r->swap[19] & ICS_FLAG_REVERSE));
+}
+
+/*-----------------------------------------------------------------------------
+ * Set servo to slave mode
+ * id: the servo id, 0-31
+ * Returns: Result to set slave mode
+ */
+int ics_set_slave(ICSData * r, UINT id)
+{
+	assert(r);
+	int i, j;
+
+	// check valid id
+	if (id > 31)
+		ics_error(r, "Invalid servo ID > 31.");
+
+	// build command
+	r->swap[0] = id | ICS_CMD_GET; // id and command
+	r->swap[1] = ICS_SC_EEPROM; // subcommand
+
+	// synchronize
+	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
+		return i;
+
+	if ( i != 68){
+		ics_error(r, "Error: could not get enough eeprom data size.");
+		return 0;
+	}
+
+	for(j=0;j<64;j++){
+		r->swap[2+j] = r->swap[4+j];
+	}
+
+	r->swap[0] = id | ICS_CMD_SET; // id and command
+	r->swap[1] = ICS_SC_EEPROM; // subcommand
+	r->swap[16] = r->swap[16] | ICS_FLAG_SLAVE; // Upper FLAG
+
+	// synchronize
+	if ((i = ics_trx_timeout(r, 66, 68, ICS_GET_TIMEOUT)) < 0)
+		return i;
+
+	// build command
+	r->swap[0] = id | ICS_CMD_GET; // id and command
+	r->swap[1] = ICS_SC_EEPROM; // subcommand
+
+	// synchronize
+	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
+		return i;
+
+	// return result
+	return !!(r->swap[18] & ICS_FLAG_SLAVE);
+}
+
+/*-----------------------------------------------------------------------------
+ * Set servo to wheel mode
+ * id: the servo id, 0-31
+ * Returns: Result to set wheel mode
  */
 int ics_set_wheel(ICSData * r, UINT id)
 {
@@ -708,6 +714,11 @@ int ics_set_wheel(ICSData * r, UINT id)
 	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
 		return i;
 
+	if ( i != 68){
+		ics_error(r, "Error: could not get enough eeprom data size.");
+		return 0;
+	}
+
 	for(j=0;j<64;j++){
 		r->swap[2+j] = r->swap[4+j];
 	}
@@ -720,7 +731,117 @@ int ics_set_wheel(ICSData * r, UINT id)
 	if ((i = ics_trx_timeout(r, 66, 68, ICS_GET_TIMEOUT)) < 0)
 		return i;
 
-	// return stretch
-	return (r->swap[66] & ICS_FLAG_WHEEL)==ICS_FLAG_WHEEL;
+	// build command
+	r->swap[0] = id | ICS_CMD_GET; // id and command
+	r->swap[1] = ICS_SC_EEPROM; // subcommand
+
+	// synchronize
+	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
+		return i;
+
+	// return result
+	return !!(r->swap[18] & ICS_FLAG_WHEEL);
+}
+
+/*-----------------------------------------------------------------------------
+ * Set servo to PWM inhibited mode
+ * id: the servo id, 0-31
+ * Returns: Result to set PWM inhibited mode
+ */
+int ics_set_pwminh(ICSData * r, UINT id)
+{
+	assert(r);
+	int i, j;
+
+	// check valid id
+	if (id > 31)
+		ics_error(r, "Invalid servo ID > 31.");
+
+	// build command
+	r->swap[0] = id | ICS_CMD_GET; // id and command
+	r->swap[1] = ICS_SC_EEPROM; // subcommand
+
+	// synchronize
+	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
+		return i;
+
+	if ( i != 68){
+		ics_error(r, "Error: could not get enough eeprom data size.");
+		return 0;
+	}
+
+	for(j=0;j<64;j++){
+		r->swap[2+j] = r->swap[4+j];
+	}
+
+	r->swap[0] = id | ICS_CMD_SET; // id and command
+	r->swap[1] = ICS_SC_EEPROM; // subcommand
+	r->swap[17] = r->swap[17] | ICS_FLAG_PWMINH; // Lower FLAG
+
+	// synchronize
+	if ((i = ics_trx_timeout(r, 66, 68, ICS_GET_TIMEOUT)) < 0)
+		return i;
+
+	// build command
+	r->swap[0] = id | ICS_CMD_GET; // id and command
+	r->swap[1] = ICS_SC_EEPROM; // subcommand
+
+	// synchronize
+	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
+		return i;
+
+	// return result
+	return !!(r->swap[19] & ICS_FLAG_PWMINH);
+}
+
+/*-----------------------------------------------------------------------------
+ * Set servo to reverse mode
+ * id: the servo id, 0-31
+ * Returns: Result to set reverse mode
+ */
+int ics_set_reverse(ICSData * r, UINT id)
+{
+	assert(r);
+	int i, j;
+
+	// check valid id
+	if (id > 31)
+		ics_error(r, "Invalid servo ID > 31.");
+
+	// build command
+	r->swap[0] = id | ICS_CMD_GET; // id and command
+	r->swap[1] = ICS_SC_EEPROM; // subcommand
+
+	// synchronize
+	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
+		return i;
+
+	if ( i != 68){
+		ics_error(r, "Error: could not get enough eeprom data size.");
+		return 0;
+	}
+
+	for(j=0;j<64;j++){
+		r->swap[2+j] = r->swap[4+j];
+	}
+
+	r->swap[0] = id | ICS_CMD_SET; // id and command
+	r->swap[1] = ICS_SC_EEPROM; // subcommand
+	r->swap[17] = r->swap[17] | ICS_FLAG_REVERSE; // Lower FLAG
+
+	// synchronize
+	if ((i = ics_trx_timeout(r, 66, 68, ICS_GET_TIMEOUT)) < 0)
+		return i;
+
+	// build command
+	r->swap[0] = id | ICS_CMD_GET; // id and command
+	r->swap[1] = ICS_SC_EEPROM; // subcommand
+
+	// synchronize
+	if ((i = ics_trx_timeout(r, 2, 68, ICS_GET_TIMEOUT)) < 0)
+		return i;
+
+	// return result
+	return !!(r->swap[19] & ICS_FLAG_REVERSE);
 }
 

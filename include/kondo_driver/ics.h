@@ -94,16 +94,18 @@ int ics_free(ICSData * r, UINT id);
 
 // servo setting commands
 int ics_get_eeprom(ICSData * r, UINT id);
+int ics_write_eeprom(ICSData * r, UINT id);
 int ics_get_stretch(ICSData * r, UINT id);
 int ics_get_speed(ICSData * r, UINT id);
 int ics_get_current(ICSData * r, UINT id);
-int ics_get_slave(ICSData * r, UINT id);
-int ics_get_wheel(ICSData * r, UINT id);
 int ics_set_stretch(ICSData * r, UINT id, UCHAR stretch);
 int ics_set_speed(ICSData * r, UINT id, UCHAR speed);
 int ics_set_current_limit(ICSData * r, UINT id, UCHAR curlim);
 int ics_set_temperature_limit(ICSData * r, UINT id, UCHAR templim);
+int ics_set_slave(ICSData * r, UINT id);
 int ics_set_wheel(ICSData * r, UINT id);
+int ics_set_pwminh(ICSData * r, UINT id);
+int ics_set_reverse(ICSData * r, UINT id);
 
 // set servo id (for use when 1 servo is connected)
 int ics_get_id(ICSData * r);

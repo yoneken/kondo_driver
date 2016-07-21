@@ -16,11 +16,11 @@ int main(int argc, char **argv)
     }
     ics.debug = 1;
     // Get servo EEPROM
-    ret = ics_get_reveerse (&ics, servo_id);
-    if(ret == 1){
-        fprintf (stderr, "Reverse mode ON\n");
+    ret = ics_set_pwminh (&ics, servo_id);
+    if(ret){
+        fprintf (stderr, "PWMINH mode ON\n");
     }else{
-        fprintf (stderr, "Reverse mode OFF\n");
+        fprintf (stderr, "PWMINH mode OFF\n");
     }
 
     return 0;

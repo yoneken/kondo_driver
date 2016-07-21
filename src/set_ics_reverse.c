@@ -6,7 +6,6 @@ int main(int argc, char **argv)
     ICSData ics;
     int product_id = strtol(argv[1], 0, 16);
     int servo_id = atoi(argv[2]);
-    int flag = atoi(argv[3]);
     int ret;
     fprintf (stderr, "product_id: %x\n", product_id);
     fprintf (stderr, "servo_id: %d\n", servo_id);
@@ -17,11 +16,11 @@ int main(int argc, char **argv)
     }
     ics.debug = 1;
     // Get servo EEPROM
-    ret = ics_get_free (&ics, servo_id);
-    if(ret == 1){
-        fprintf (stderr, "Free mode ON\n");
+    ret = ics_set_reverse (&ics, servo_id);
+    if(ret){
+        fprintf (stderr, "Reverse mode ON\n");
     }else{
-        fprintf (stderr, "Free mode OFF\n");
+        fprintf (stderr, "Reverse mode OFF\n");
     }
 
     return 0;

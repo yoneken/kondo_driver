@@ -16,9 +16,12 @@ int main(int argc, char **argv)
     }
     ics.debug = 1;
     // Get servo EEPROM
-    ret = ics_get_eeprom (&ics, servo_id);
-    fprintf (stderr, "Current servo EEPROM: %x\n", ret);
-
+    ret = ics_clear_flag (&ics, servo_id);
+    if(ret){
+        fprintf (stderr, "Cleared all flags\n");
+    }else{
+        fprintf (stderr, "Failed to clear flags\n");
+    }
 
     return 0;
 }	

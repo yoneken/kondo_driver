@@ -105,8 +105,11 @@ include_directories(
 ## Declare a cpp executable
 add_executable(kondo_driver src/kondo_driver.cpp src/ics.c)
 add_executable(set_ics_id src/set_ics_id.c src/ics.c)
-add_executable(get_ics_eeprom src/get_ics_eeprom.c src/ics.c)
+add_executable(clear_ics_flag src/clear_ics_flag.c src/ics.c)
+add_executable(set_ics_slave src/set_ics_slave.c src/ics.c)
 add_executable(set_ics_wheel src/set_ics_wheel.c src/ics.c)
+add_executable(set_ics_pwminh src/set_ics_pwminh.c src/ics.c)
+add_executable(set_ics_reverse src/set_ics_reverse.c src/ics.c)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -120,10 +123,19 @@ target_link_libraries(kondo_driver
 target_link_libraries(set_ics_id
   usb ftdi
 )
-target_link_libraries(get_ics_eeprom
+target_link_libraries(clear_ics_flag
+  usb ftdi
+)
+target_link_libraries(set_ics_slave
   usb ftdi
 )
 target_link_libraries(set_ics_wheel
+  usb ftdi
+)
+target_link_libraries(set_ics_pwminh
+  usb ftdi
+)
+target_link_libraries(set_ics_reverse
   usb ftdi
 )
 
@@ -142,7 +154,7 @@ target_link_libraries(set_ics_wheel
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS kondo_driver set_ics_id get_ics_eeprom set_ics_wheel
+install(TARGETS kondo_driver set_ics_id clear_ics_flag set_ics_slave set_ics_wheel set_ics_pwminh set_ics_reverse
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
